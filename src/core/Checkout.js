@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { isAuth } from '../auth/helpers'
 import DropIn from "braintree-web-drop-in-react";
-import { getBraintreeToken } from './ApiCore'
+import { getBraintreeToken, processPayment } from './ApiCore'
 
 function Checkout({products}) {
 
@@ -43,7 +43,7 @@ useEffect(()=>{
           {braintreeData.braintreeToken !== null && products.length > 0 && (
 
             <DropIn
-            options={{ authorization : braintreeData.braintreeToken }}
+            options={{ authorization : braintreeData.braintreeToken, paypal : {flow : "vault"} }}
             onInstance={instance => (braintreeData.instance = instance)}
           />
           )}
@@ -52,7 +52,16 @@ useEffect(()=>{
 
     const buyNow = () => {
       braintreeData.instance.requestPaymentMethod()
-                  .then(data => console.log(data))
+                  .then(data => {
+                    let paymentData = {
+                      amount : totalCart(products),
+                      paymentMethodNonce : data.nonce
+                    }
+                    processPayment(userId, Auth_token, paymentData)
+                            .then(res => console.log(res))
+                            .catch(err => console.log(err))
+                    
+                  })
     }
     
 

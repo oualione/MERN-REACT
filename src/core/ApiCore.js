@@ -77,6 +77,20 @@ export const getBraintreeToken = (userId, token) => {
     .then(res => res.json())
 
 }
+
+export const processPayment = (userId, token, paymentData) => {
+    return fetch(`${API_URL}/braintree/purchase/${userId}`, {
+        method : 'POST',
+        headers : {
+            "Accept": "application/json",
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body : JSON.stringify(paymentData)
+    })
+    .then(res => res.json())
+
+}
           
      
                                       
